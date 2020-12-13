@@ -6,7 +6,7 @@ namespace OutOfOrderCpuSimulator
 {
     class CPU
     {
-        private const int PHYSICAL_REGISTER_COUNT = 32;
+        private const int PHYSICAL_REGISTER_COUNT = 96;
         private const int ARCHITECTURE_REGISTER_COUNT = 8; // Don't change this.
         private const int ISSUE_QUEUE_SIZE = 16;
         private const int REORDER_BUFFER_SIZE = 16;
