@@ -1,0 +1,200 @@
+\documentclass[]{article}
+\usepackage{bytefield}
+\usepackage{longtable}
+
+\setlength{\tabcolsep}{2pt}
+
+%opening
+\title{ISA Specification}
+\author{James Fletcher}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\begin{abstract}
+
+\end{abstract}
+
+\section{Summary}
+A fictitious RISC Store-Load 32-bit CPU architecture specification for an out-of-order, speculative and superscalar CPU simulator. The CPU has 16 general-purpose 32-bit registers. The instruction set is based upon RISC-V and MIPS. Register 0 is wired to zero value and any writes to register 0 will be silently ignored.
+
+\section{Instruction Formats}
+There are 3 different formats of instructions, all 32 bits in size, as outlined below. All have a 7 bit opcode field placed at the MSB \footnote{MSB - Most Significant Byte}. A key is also provided to describe field names. \vspace{2ex}
+
+\subsection{Field Key}
+\begin{tabular}{|c|c|} 
+	\hline
+	Field Name & Description \\
+	\hline
+	Op & 6 Operation \\ 
+	\hline
+	Src1 & Source 1 Register \\
+	\hline
+	Src2 & Source 2 Register \\
+	\hline
+	Dst & Destination Register \\
+	\hline
+	Variable & Depends on operation \\
+	\hline
+	Constant & A constant value \\
+	\hline
+\end{tabular}
+
+\subsection{Instruction Format 1 - A}
+\begin{bytefield}[endianness=big,bitwidth=.8em]{32}
+	\bitheader{0-31} \\
+	\bitbox{7}{Op} & \bitboxes{1}{0000000000000} & \bitbox{4}{Dst} & \bitbox{4}{Src1} & \bitbox{4}{Src2}
+\end{bytefield}
+\subsection{Instruction Format 2 - B}
+\begin{bytefield}[endianness=big,bitwidth=.8em]{32}
+	\bitheader{0-31} \\
+	\bitbox{7}{Op} & \bitbox{17}{Variable} & \bitbox{4}{Src1} & \bitbox{4}{Src2}
+\end{bytefield}
+\subsection{Instruction Format 3 - C}
+\begin{bytefield}[endianness=big,bitwidth=.8em]{32}
+\bitheader{0-31} \\
+\bitbox{7}{Op} & \bitbox{21}{Constant} \bitbox{4}{Dst}
+\end{bytefield}
+
+\section{Instruction List}
+The table below gives an overview of the instructions supported by the processor as well as an example of what the instruction would look like. Further on, each instruction's pseudo-code implementation is provided to help aid understanding.
+
+\begin{longtable}{|c|l|c|l|l|}
+	\hline
+	Op & Instruction & I Form & Example & Description \\
+	\hline
+	\multicolumn{5}{|c|}{Load Instructions - "Var" is memory offset constant} \\
+	\hline
+	0h & lw Src1, Src2, Var & B & lw r1, r2, 0 & Load Word \\
+	\hline
+	1h & lwu Src1, Src2, Var & B & lwu r1, r2, 8 & Load Word Unsigned \\
+	\hline
+	2h & lb Src1, Src2, Var & B & lb r1, r2, -4 & Load Byte\\
+	\hline
+	3h & lbu Src1, Src2, Var & B & lbu r3, r2, 4 & Load Byte Unsigned \\
+	\hline
+	4h & lh Src1, Src2, Var & B & lh r1, r15, 2 & Load Half-Word \\
+	\hline
+	5h & lhu Src1, Src2, Var & B & lhu r5, r8, 0 & Load Half-Word Unsigned \\
+	\hline
+	\multicolumn{5}{|c|}{Store Instructions - "Var" is memory offset constant} \\
+	\hline
+	6h & sw Src1, Src2, Var & B & sw r2, r1, -4 & Store Word \\
+	\hline
+	7h & sb Src1, Src2, Var & B & sb r2, r1, 2 & Store Byte \\
+	\hline
+	8h & sh Src1, Src2, Var & B & sh r2, r1, 0 & Load Half-Word \\
+	\hline
+	\multicolumn{5}{|c|}{Load Immediate Instructions} \\
+	\hline
+	9h & ldi Src1, Const & C & ldi r1, 1024 & Load const to reg \\
+	\hline
+	Ah & ldhi Src1, Const & C & ldhi r3, 0 & Load const to upper 11-bits of reg \\
+	\hline
+	\multicolumn{5}{|c|}{Comparison Instructions - Var is a const value} \\
+	\hline
+	Bh & slt Dst, Src1, Src2 & A & slt r5, r8, r9 & Set Dst if Src1 $<$ Src2 \\
+	\hline
+	Ch & sltu Dst, Src1, Src2 & A & sltu r5, r8, r9 & Set Dst if Src1 $<$ Src2 \\
+	\hline
+	Dh & slti Src1, Src2, Var & B & slti r5, r8, -2 & Set Src1 if Src2 $<$ Var \\
+	\hline
+	Eh & sltiu Src1, Src2, Var & B & sltiu r5, r8, 5 & Set Src1 if Src2 $<$ Var \\
+	\multicolumn{5}{|c|}{Control Flow Instructions} \\
+	\hline
+	Fh & beq Src1, Src2, Var & B & beq r5, r8, -2 & Branch if Src1 $=$ Src2 to PC += Var \\
+	\hline
+	10h & bne Src1, Src2, Var & B & bne r5, r8, -2 & Branch if Src1 $!=$ Src2 to PC += Var \\
+	\hline
+	11h & blt Src1, Src2, Var & B & blt r5, r8, -2 & Branch if Src1 $<$ Src2 to PC += Var \\
+	\hline
+	12h & bge Src1, Src2, Var & B & bge r5, r8, -2 & Branch if Src1 $>$ Src2 to PC += Var \\
+	\hline
+	13h & bltu Src1, Src2, Var & B & bltu r5, r8, -2 & Branch if Src1 $<$ Src2 to PC += Var \\
+	\hline
+	14h & bgeu Src1, Src2, Var & B & bgeu r5, r8, -2 & Branch if Src1 $>$ Src2 to PC += Var \\
+	\hline
+	15h & jal Dst, Var & C & jal r5, r8, -2 & Dst = PC + 4, PC += Var \\
+	\hline
+	16h & jalr Src1, Src2, Var & B & jalr r5, r8, -2 & Src1 = PC + 4, PC = Src2 + Var \\
+	\hline
+	17h & j Const & C & j label & PC += Const \\
+	\hline
+	18h & jr Dst, Var & B & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	\multicolumn{5}{|c|}{Arithmetic Instructions} \\
+	\hline
+	19h & add Dst, Src1, Src2 & A & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	1Ah & addi Dst, Src1, Const & B & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	1Bh & sub Dst, Src1, Src2 & A & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	1Ch & subi Dst, Src1, Const & B & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	1Dh & mul Dst, Src1, Src2 & A & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	1Eh & mulh Dst, Src1, Src2 & A & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	1Fh & mulhsu Dst, Src1, Src2 & A & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	20h & mulhu Dst, Src1, Src2 & A & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	21h & div Dst, Src1, Src2 & A & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	22h & divu Dst, Src1, Src2 & A & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	23h & rem Dst, Src1, Src2 & A & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	24h & remu Dst, Src1, Src2 & A & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	\multicolumn{5}{|c|}{Logic Instructions} \\
+	\hline
+	25h & and Dst, Src1, Src2 & A & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	26h & or Dst, Src1, Src2 & A & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	27h & xor Dst, Src1, Src2 & A & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	28h & andi Dst, Src1, Const & B & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	29h & ori Dst, Src1, Const & B & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	2Ah & xori Dst, Src1, Const & B & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	2Bh & srl Dst, Src1, Src2 & A & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	2Ch & srli Dst, Src1, Const & B & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	2Dh & sll Dst, Src1, Src2 & A & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	2Eh & slli Dst, Src1, Const & B & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	2Fh & srai Dst, Src1, Const & B & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	30h & sra Dst, Src1, Src2 & A & jr r2, 0 & PC = Dst + Const \\
+	\hline
+	\multicolumn{5}{|c|}{Experimental Instructions} \\
+	\hline
+	XXh & pushb Dst, Src1 & A & pushb r1, r2 & mem[Dst] = Src1[0:7], Dst+=1 \\
+	\hline
+	XXh & pushh Dst, Src1 & A & pushh r1, r2 & mem[Dst] = Src1[0:15], Dst+=2 \\
+	\hline
+	XXh & push Dst, Src1 & A & push r1, r2 & mem[Dst] = Src1, Dst+=4 \\
+	\hline
+	XXh & popb Dst, Src1 & A & popb r1, r2 & Dst-=1, Src1[0:7]=mem[Dst] \\
+	\hline
+	XXh & poph Dst, Src1 & A & poph r1, r2 & Dst-=2, Src1[0:15]=mem[Dst] \\
+	\hline
+	XXh & pop Dst, Src1 & A & pop r1, r2 & Dst-=4, Src1=mem[Dst] \\
+	\hline
+\end{longtable}
+
+\section{Memory}
+This defines how memory is interacted with and is currently not decided on.
+Total Store Ordering? Weak Memory Model? Strong Memory Model?
+
+\end{document}
