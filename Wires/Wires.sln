@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wires", "Wires\Wires.csproj", "{3D3100E8-99BB-4703-B9A5-378AEDA716E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wires", "Wires\Wires.csproj", "{3D3100E8-99BB-4703-B9A5-378AEDA716E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulatedAnnealingExample", "SimulatedAnnealingExample\SimulatedAnnealingExample.csproj", "{E2DC95C1-127C-4B46-B05C-D4EB0ABF894E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimulatedAnnealingExample", "SimulatedAnnealingExample\SimulatedAnnealingExample.csproj", "{E2DC95C1-127C-4B46-B05C-D4EB0ABF894E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutOfOrderCpuSimulator", "OutOfOrderCpuSimulator\OutOfOrderCpuSimulator.csproj", "{5966AC9E-9153-4736-9161-883DA1BE498C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OutOfOrderCpuSimulator", "OutOfOrderCpuSimulator\OutOfOrderCpuSimulator.csproj", "{5966AC9E-9153-4736-9161-883DA1BE498C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CPUSimTests", "CPUSimTests\CPUSimTests.csproj", "{75977AEA-E529-4B69-BE61-3ACE840927F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{5966AC9E-9153-4736-9161-883DA1BE498C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5966AC9E-9153-4736-9161-883DA1BE498C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5966AC9E-9153-4736-9161-883DA1BE498C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75977AEA-E529-4B69-BE61-3ACE840927F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75977AEA-E529-4B69-BE61-3ACE840927F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75977AEA-E529-4B69-BE61-3ACE840927F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75977AEA-E529-4B69-BE61-3ACE840927F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
