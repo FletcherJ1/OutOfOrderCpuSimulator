@@ -6,6 +6,7 @@ I was intrigued how "modern" CPU's work and decided the best way was through mak
  * /Wires
  * /Wires/Wires - Cell placement and routing with visualization
  * /Wires/OutOfOrderCpuSimulator - CPU simulator
+ * /Wires/CPUSimTests - Unit tests for CPU simulator instruction set
  * /Wires/SimulatedAnnealingExample - An example showing how simulated annealing works which is used in the placement algorithm for cells.
 
 ## CPU Simulator Features:
