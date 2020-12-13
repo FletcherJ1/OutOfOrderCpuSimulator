@@ -3,7 +3,7 @@ This is an example to show what simulated annealing can do with grouping colours
 The gifs below show how the algorithm converges.
 
 ## Group pixels of 2 different colours together
-![Two Colors](../../Pics/simulated_annealing_2.gif)
+![Two Colors](../../Pics/simulated_annealing.gif)
 ## Group pixels of 3 different colours together
 ![Three Colors](../../Pics/simulated_annealing_3.gif)
 ## Group pixels of 4 different colours together
