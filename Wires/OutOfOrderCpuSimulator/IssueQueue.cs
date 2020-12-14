@@ -10,10 +10,10 @@ namespace OutOfOrderCpuSimulator
         public class Entry
         {
             public UInt32 PC;
-            public char Op;
-            public char Dst;
-            public char Src1;
-            public char Src2;
+            public byte Op;
+            public byte Dst;
+            public byte Src1;
+            public byte Src2;
             public bool Rd1;
             public bool Rd2;
         }
@@ -37,7 +37,7 @@ namespace OutOfOrderCpuSimulator
             return this.IQueue.Count == 0;
         }
 
-        public void AddToQueue(UInt32 pc, char op, char src1, char src2, char dst, bool rd1, bool rd2)
+        public void AddToQueue(UInt32 pc, byte op, byte src1, byte src2, byte dst, bool rd1, bool rd2)
         {
             Debug.Assert(!IsFull());
             IQueue.Add(new Entry() { PC = pc, Op = op, Src1 = src1, Src2 = src2, Rd1 = rd1, Rd2 = rd2, Dst = dst });
@@ -59,7 +59,7 @@ namespace OutOfOrderCpuSimulator
             this.IQueue.RemoveAt(idx);
         }
 
-        public void BroadcastTag(char tag)
+        public void BroadcastTag(byte tag)
         {
             // Check any instruction in issue queue to see if the source operands match the tag.
             // If so, it is ready to be used.

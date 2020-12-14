@@ -35,7 +35,7 @@ namespace OutOfOrderCpuSimulator
         /// Add an unused register to the free list.
         /// </summary>
         /// <param name="dst">Physical register id</param>
-        public void Add(char dst)
+        public void Add(byte dst)
         {
             this.UnusedRegisters.Enqueue(dst);
         }

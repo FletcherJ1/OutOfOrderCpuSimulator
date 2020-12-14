@@ -141,12 +141,17 @@ namespace OutOfOrderCpuSimulator
                 UInt32 i = d.Data;
                 DecodedOp op;
                 op.PC = d.PC;
-                op.Op = (char)(i >> 25);
+                op.Op = (byte)(i >> 25);
                 op.Const = (UInt32)(i >> 4) & 0x1FFFFFU;
                 op.Var = (UInt32)(i >> 8) & 0x1FFFF;
-                op.Dst = (char)((i >> 8) & 0xf);
-                op.Src1 = (char)((i >> 4) & 0xf);
-                op.Src2 = (char)((i >> 0) & 0xf);
+                op.Dst = (byte)((i >> 8) & 0xf);
+                op.Src1 = (byte)((i >> 4) & 0xf);
+                op.Src2 = (byte)((i >> 0) & 0xf);
+                op.DependS1 = OpCodes.GetSrc1Dependency(op.Op);
+                op.DependS2 = OpCodes.GetSrc2Dependency(op.Op);
+
+                // TODO: Work out dependency based on opcode and write into decoded op
+
                 DE_RN.Ops.Enqueue(op);
                 // Optimization: Check op is a branch and if it is use branch prediction
                 // to load in new instructions and do a partial pipeline flush.
@@ -166,12 +171,12 @@ namespace OutOfOrderCpuSimulator
             while (PhysFreeList.PhysicalRegisterAvailable() && !this.IQueue.IsFull() && !ROB.Full() && DE_RN.Ops.Count > 0 && maxRename < 4)
             {
                 DecodedOp o = DE_RN.Ops.Dequeue();
-                char op = o.Op;
+                byte op = o.Op;
                 // TODO: Don't cast this. Do it properly.
-                char dst = (char)PhysFreeList.GetUnusedRegister();
+                byte dst = (byte)PhysFreeList.GetUnusedRegister();
                 PhysRegisters.SetReady(dst, false);
-                char src1 = (char)ArchToPhysTable.GetPhysicalRegisterId(o.Src1);
-                char src2 = (char)ArchToPhysTable.GetPhysicalRegisterId(o.Src2);
+                byte src1 = (byte)ArchToPhysTable.GetPhysicalRegisterId(o.Src1);
+                byte src2 = (byte)ArchToPhysTable.GetPhysicalRegisterId(o.Src2);
                 bool rd1 = PhysRegisters.IsReady(src1);
                 bool rd2 = PhysRegisters.IsReady(src2);
                 int prev = ArchToPhysTable.MapArchToPhys(o.Dst, dst);
@@ -254,7 +259,7 @@ namespace OutOfOrderCpuSimulator
                 if (u.Finished())
                 {
                     UInt32 res = u.GetOutput();
-                    char dst = u.GetDst();
+                    byte dst = u.GetDst();
                     UInt32 pc = u.GetPC();
                     // Update ROB with result, mark instruction as completed in ROB and broadcast result to issue queue
                     // Update phys register with result

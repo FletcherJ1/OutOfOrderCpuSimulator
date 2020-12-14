@@ -11,7 +11,7 @@ namespace OutOfOrderCpuSimulator
         {
             public UInt32 PC;
             public int ArchDst;
-            public char PhysDst;
+            public byte PhysDst;
             public UInt32 Result;
             public bool Completed;
             public bool Branch;
@@ -30,7 +30,7 @@ namespace OutOfOrderCpuSimulator
             return this.Buffer.Count >= MaxSize;
         }
 
-        public void AddToQueue(UInt32 pc, int archDst, char physDst)
+        public void AddToQueue(UInt32 pc, int archDst, byte physDst)
         {
             Debug.Assert(!Full());
             // When instruction is added to queue, it is not completed.

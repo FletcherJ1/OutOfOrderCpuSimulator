@@ -10,8 +10,8 @@ namespace OutOfOrderCpuSimulator
         private int CycleCount = 0;
         private bool OutputReserved = false;
         private UInt32 PC;
-        private char Dst;
-        protected char Op;
+        private byte Dst;
+        protected byte Op;
         protected UInt32 Src1;
         protected UInt32 Src2;
 
@@ -29,9 +29,9 @@ namespace OutOfOrderCpuSimulator
             return CycleCount != 0 || OutputReserved;
         }
 
-        public abstract bool AcceptsOp(char op);
+        public abstract bool AcceptsOp(byte op);
 
-        public void GiveWork(UInt32 pc, char op, UInt32 src1, UInt32 src2, char dst)
+        public void GiveWork(UInt32 pc, byte op, UInt32 src1, UInt32 src2, byte dst)
         {
             this.CycleCount = GetCycleCount(op, src1, src2, dst);
             this.OutputReserved = false;
@@ -42,7 +42,7 @@ namespace OutOfOrderCpuSimulator
             this.Dst = dst;
         }
 
-        protected abstract int GetCycleCount(char op, UInt32 src1, UInt32 src2, char dst);
+        protected abstract int GetCycleCount(byte op, UInt32 src1, UInt32 src2, byte dst);
 
         protected abstract UInt32 GetResult();
 
@@ -62,7 +62,7 @@ namespace OutOfOrderCpuSimulator
             return this.WorkCycles;
         }
 
-        public char GetDst()
+        public byte GetDst()
         {
             return this.Dst;
         }
