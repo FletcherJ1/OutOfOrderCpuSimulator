@@ -9,7 +9,7 @@ namespace OutOfOrderCpuSimulator
         // Required cycles for the operation
         private int CycleCount = 0;
         private bool OutputReserved = false;
-        private int PC;
+        private UInt32 PC;
         private char Dst;
         protected char Op;
         protected UInt32 Src1;
@@ -31,7 +31,7 @@ namespace OutOfOrderCpuSimulator
 
         public abstract bool AcceptsOp(char op);
 
-        public void GiveWork(int pc, char op, UInt32 src1, UInt32 src2, char dst)
+        public void GiveWork(UInt32 pc, char op, UInt32 src1, UInt32 src2, char dst)
         {
             this.CycleCount = GetCycleCount(op, src1, src2, dst);
             this.OutputReserved = false;
@@ -52,7 +52,7 @@ namespace OutOfOrderCpuSimulator
             return this.Result;
         }
 
-        public int GetPC()
+        public UInt32 GetPC()
         {
             return this.PC;
         }

@@ -9,7 +9,7 @@ namespace OutOfOrderCpuSimulator
     {
         public class Entry
         {
-            public int PC;
+            public UInt32 PC;
             public int ArchDst;
             public char PhysDst;
             public UInt32 Result;
@@ -30,7 +30,7 @@ namespace OutOfOrderCpuSimulator
             return this.Buffer.Count >= MaxSize;
         }
 
-        public void AddToQueue(int pc, int archDst, char physDst)
+        public void AddToQueue(UInt32 pc, int archDst, char physDst)
         {
             Debug.Assert(!Full());
             // When instruction is added to queue, it is not completed.
@@ -52,7 +52,7 @@ namespace OutOfOrderCpuSimulator
             return Buffer.Dequeue();
         }
 
-        public void MarkCompleted(int pc, UInt32 res)
+        public void MarkCompleted(UInt32 pc, UInt32 res)
         {
             foreach (var e in Buffer)
             {

@@ -21,7 +21,7 @@ namespace OutOfOrderCpuSimulator
 
         private int Cycles = 0;
         private int RetiredInstructionCount = 0;
-        private int PC = 0; // Program Counter, not surprisingly.
+        private UInt32 PC = 0; // Program Counter, not surprisingly.
 
         private UInt16[] InstructionList; // No memory at the moment, just have a list of instructions.
 
@@ -138,13 +138,15 @@ namespace OutOfOrderCpuSimulator
             while (!DE_RN.Stalled && FE_DE.Instructions.Count > 0 && maxDecode < 4)
             {
                 IData d = FE_DE.Instructions.Dequeue();
-                UInt16 i = d.Data;
+                UInt32 i = d.Data;
                 DecodedOp op;
                 op.PC = d.PC;
-                op.Op = (char)(i >> 9);
-                op.Dst = (char)((i >> 6) & 7);
-                op.Src1 = (char)((i >> 3) & 7);
-                op.Src2 = (char)((i >> 0) & 7);
+                op.Op = (char)(i >> 25);
+                op.Const = (UInt32)(i >> 4) & 0x1FFFFFU;
+                op.Var = (UInt32)(i >> 8) & 0x1FFFF;
+                op.Dst = (char)((i >> 8) & 0xf);
+                op.Src1 = (char)((i >> 4) & 0xf);
+                op.Src2 = (char)((i >> 0) & 0xf);
                 DE_RN.Ops.Enqueue(op);
                 // Optimization: Check op is a branch and if it is use branch prediction
                 // to load in new instructions and do a partial pipeline flush.
@@ -253,7 +255,7 @@ namespace OutOfOrderCpuSimulator
                 {
                     UInt32 res = u.GetOutput();
                     char dst = u.GetDst();
-                    int pc = u.GetPC();
+                    UInt32 pc = u.GetPC();
                     // Update ROB with result, mark instruction as completed in ROB and broadcast result to issue queue
                     // Update phys register with result
                     ROB.MarkCompleted(pc, res);

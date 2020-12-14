@@ -88,9 +88,9 @@ The table below gives an overview of the instructions supported by the processor
 	\hline
 	\multicolumn{6}{|c|}{Load Immediate Instructions} \\
 	\hline
-	9h & ldi Src1, Const & 1 & C & ldi r1, 1024 & Load const to reg \\
+	9h & ldi Dst, Const & 1 & C & ldi r1, 1024 & Load const to reg \\
 	\hline
-	Ah & ldhi Src1, Const & 1 & C & ldhi r3, 0 & Load const to upper 11-bits of reg \\
+	Ah & ldhi Dst, Const & 1 & C & ldhi r3, 0 & Load const to upper 11-bits of reg \\
 	\hline
 	\multicolumn{6}{|c|}{Comparison Instructions - Var is a const value} \\
 	\hline
@@ -115,7 +115,7 @@ The table below gives an overview of the instructions supported by the processor
 	\hline
 	14h & bgeu Src1, Src2, Var & 3 & B & bgeu r5, r8, -2 & Branch if Src1 $>$ Src2 to PC += Var \\
 	\hline
-	15h & jal Dst, Var & 2 & C & jal r5, r8, -2 & Dst = PC + 4, PC += Var \\
+	15h & jal Dst, Var & 2 & C & jal r5, -2 & Dst = PC + 4, PC += Var \\
 	\hline
 	16h & jalr Src1, Src2, Var & 3 & B & jalr r5, r8, -2 & Src1 = PC + 4, PC = Src2 + Var \\
 	\hline

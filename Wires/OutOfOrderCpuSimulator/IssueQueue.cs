@@ -9,7 +9,7 @@ namespace OutOfOrderCpuSimulator
     {
         public class Entry
         {
-            public int PC;
+            public UInt32 PC;
             public char Op;
             public char Dst;
             public char Src1;
@@ -37,7 +37,7 @@ namespace OutOfOrderCpuSimulator
             return this.IQueue.Count == 0;
         }
 
-        public void AddToQueue(int pc, char op, char src1, char src2, char dst, bool rd1, bool rd2)
+        public void AddToQueue(UInt32 pc, char op, char src1, char src2, char dst, bool rd1, bool rd2)
         {
             Debug.Assert(!IsFull());
             IQueue.Add(new Entry() { PC = pc, Op = op, Src1 = src1, Src2 = src2, Rd1 = rd1, Rd2 = rd2, Dst = dst });
