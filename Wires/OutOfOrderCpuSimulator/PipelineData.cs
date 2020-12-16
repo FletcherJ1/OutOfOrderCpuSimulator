@@ -24,8 +24,7 @@ namespace OutOfOrderCpuSimulator
         public byte Src2; // 4 bits[0:3]
         public UInt32 Var; // 13 bits[8:24]
         public UInt32 Const; // 21 bits[4:24]
-        public bool DependS1; // Instruction dependant on src1
-        public bool DependS2; // Instruction dependant on src2
+        public OpCodes.OpInfo Meta;
     }
 
     struct DE_RN_Stage

@@ -147,10 +147,8 @@ namespace OutOfOrderCpuSimulator
                 op.Dst = (byte)((i >> 8) & 0xf);
                 op.Src1 = (byte)((i >> 4) & 0xf);
                 op.Src2 = (byte)((i >> 0) & 0xf);
-                op.DependS1 = OpCodes.GetSrc1Dependency(op.Op);
-                op.DependS2 = OpCodes.GetSrc2Dependency(op.Op);
-
-                // TODO: Work out dependency based on opcode and write into decoded op
+                OpCodes.OpInfo opd = OpCodes.GetInfo((OpCodes.Op)op.Op);
+                op.Meta = opd;
 
                 DE_RN.Ops.Enqueue(op);
                 // Optimization: Check op is a branch and if it is use branch prediction
@@ -166,20 +164,44 @@ namespace OutOfOrderCpuSimulator
 
         private void Rename()
         {
-            
             int maxRename = 0;
             while (PhysFreeList.PhysicalRegisterAvailable() && !this.IQueue.IsFull() && !ROB.Full() && DE_RN.Ops.Count > 0 && maxRename < 4)
             {
                 DecodedOp o = DE_RN.Ops.Dequeue();
                 byte op = o.Op;
-                // TODO: Don't cast this. Do it properly.
-                byte dst = (byte)PhysFreeList.GetUnusedRegister();
-                PhysRegisters.SetReady(dst, false);
-                byte src1 = (byte)ArchToPhysTable.GetPhysicalRegisterId(o.Src1);
-                byte src2 = (byte)ArchToPhysTable.GetPhysicalRegisterId(o.Src2);
-                bool rd1 = PhysRegisters.IsReady(src1);
-                bool rd2 = PhysRegisters.IsReady(src2);
-                int prev = ArchToPhysTable.MapArchToPhys(o.Dst, dst);
+                OpCodes.OpInfo opi = o.Meta;
+                byte dst = 0;
+                if (opi.HasOutput)
+                {
+                    // TODO: Don't cast this. Do it properly.
+                    dst = (byte)PhysFreeList.GetUnusedRegister();
+                    PhysRegisters.SetReady(dst, false);
+                }
+
+                byte src1 = (byte)ArchToPhysTable.GetPhysicalRegisterId(opi.Src1Dep ? o.Src1 : 0);
+                byte src2 = (byte)ArchToPhysTable.GetPhysicalRegisterId(opi.Src2Dep ? o.Src2 : 0);
+                bool rd1 = opi.Src1Dep ? PhysRegisters.IsReady(src1) : true;
+                bool rd2 = opi.Src2Dep ? PhysRegisters.IsReady(src2) : true;
+
+                if (opi.HasOutput)
+                {
+                    byte archReg = 0;
+                    switch (opi.OutputSource)
+                    {
+                        case OpCodes.DstSource.Dst:
+                            archReg = o.Dst;
+                            break;
+                        case OpCodes.DstSource.Src1:
+                            archReg = o.Src1;
+                            break;
+                        case OpCodes.DstSource.Src2:
+                            archReg = o.Src2;
+                            break;
+                    }
+                    ArchToPhysTable.MapArchToPhys(archReg, dst);
+                    // Redirect dst register to the correct destination.
+                    o.Dst = archReg;
+                }
                 // Resulting register of this operation should be declared not ready until it has executed.
                 Console.WriteLine("Rename: rd1={0}, rd2={1}, src1={2}, src2={3}, dst={4}", rd1, rd2, (int)src1, (int)src2, (int)dst);
                 // Add entry to issue queue and re-order buffer

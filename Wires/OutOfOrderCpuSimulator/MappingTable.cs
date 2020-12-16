@@ -56,12 +56,9 @@ namespace OutOfOrderCpuSimulator
         /// </summary>
         /// <param name="archRegId">Architectural register id</param>
         /// <param name="physRegId">Physical register id</param>
-        /// <returns>Previous physical register this architectural register mapped onto</returns>
-        public int MapArchToPhys(int archRegId, int physRegId)
+        public void MapArchToPhys(int archRegId, int physRegId)
         {
-            int prev = Map[archRegId];
             Map[archRegId] = physRegId;
-            return prev;
         }
     }
 }

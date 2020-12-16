@@ -56,7 +56,7 @@ There are 3 different formats of instructions, all 32 bits in size, as outlined 
 \subsection{Instruction Format 3 - C}
 \begin{bytefield}[endianness=big,bitwidth=.8em]{32}
 \bitheader{0-31} \\
-\bitbox{7}{Op} & \bitbox{21}{Constant} \bitbox{4}{Dst}
+\bitbox{7}{Op} & \bitbox{21}{Constant} \bitbox{4}{Src2}
 \end{bytefield}
 
 \section{Instruction List}
@@ -88,9 +88,9 @@ The table below gives an overview of the instructions supported by the processor
 	\hline
 	\multicolumn{6}{|c|}{Load Immediate Instructions} \\
 	\hline
-	9h & ldi Dst, Const & 1 & C & ldi r1, 1024 & Load const to reg \\
+	9h & ldi Src2, Const & 1 & C & ldi r1, 1024 & Load const to reg \\
 	\hline
-	Ah & ldhi Dst, Const & 1 & C & ldhi r3, 0 & Load const to upper 11-bits of reg \\
+	Ah & ldhi Src2, Const & 1 & C & ldhi r3, 0 & Load const to upper 11-bits of reg \\
 	\hline
 	\multicolumn{6}{|c|}{Comparison Instructions - Var is a const value} \\
 	\hline
@@ -115,23 +115,23 @@ The table below gives an overview of the instructions supported by the processor
 	\hline
 	14h & bgeu Src1, Src2, Var & 3 & B & bgeu r5, r8, -2 & Branch if Src1 $>$ Src2 to PC += Var \\
 	\hline
-	15h & jal Dst, Var & 2 & C & jal r5, -2 & Dst = PC + 4, PC += Var \\
+	15h & jal Src2, Var & 2 & C & jal r5, -2 & Src2 = PC + 4, PC += Var \\
 	\hline
 	16h & jalr Src1, Src2, Var & 3 & B & jalr r5, r8, -2 & Src1 = PC + 4, PC = Src2 + Var \\
 	\hline
 	17h & j Const & 1 & C & j label & PC += Const \\
 	\hline
-	18h & jr Dst, Var & 2 & B & jr r2, 0 & PC = Dst + Const \\
+	18h & jr Src2, Var & 2 & C & jr r2, 0 & PC = Src2 + Const \\
 	\hline
 	\multicolumn{6}{|c|}{Arithmetic Instructions} \\
 	\hline
 	19h & add Dst, Src1, Src2 & 1 & A & add r1, r2, r3 & Dst = Src1+Src2 \\
 	\hline
-	1Ah & addi Dst, Src1, Const & 1 & B & addi r1, r2, 3 & Dst = Src1+Const \\
+	1Ah & addi Src1, Src2, Const & 1 & B & addi r1, r2, 3 & Src1 = Src2+Const \\
 	\hline
 	1Bh & sub Dst, Src1, Src2 & 1 & A & sub r1, r2, r3 & Dst=Src1-Src2 \\
 	\hline
-	1Ch & subi Dst, Src1, Const & 1 & B & subi r1, r2, 2 & Dst=Src1-Const \\
+	1Ch & subi Src1, Src2, Const & 1 & B & subi r1, r2, 2 & Src1=Src2-Const \\
 	\hline
 	1Dh & mul Dst, Src1, Src2 & 7 & A & mul r1, r2, r3 & Dst = Src1*Src2 \\
 	\hline
@@ -157,21 +157,21 @@ The table below gives an overview of the instructions supported by the processor
 	\hline
 	27h & xor Dst, Src1, Src2 & 1 & A & xor r1, r2, r3 & Dst = Src1\string^Src2 \\
 	\hline
-	28h & andi Dst, Src1, Const & 1 & B & andi r1, r2, 1 & Dst = Src1\&Const \\
+	28h & andi Src1, Src2, Const & 1 & B & andi r1, r2, 1 & Src1 = Src2\&Const \\
 	\hline
-	29h & ori Dst, Src1, Const & 1 & B & ori r1, r2, 2 & Dst = Src1$|$Const \\
+	29h & ori Src1, Src2, Const & 1 & B & ori r1, r2, 2 & Src1 = Src2$|$Const \\
 	\hline
-	2Ah & xori Dst, Src1, Const & 1 & B & xori r1, r2, r3 & Dst = Src1\string^Const \\
+	2Ah & xori Src1, Src2, Const & 1 & B & xori r1, r2, r3 & Src1 = Src2\string^Const \\
 	\hline
 	2Bh & srl Dst, Src1, Src2 & 1 & A & srl r1, r2, r3 & Dst = Src1$>>$Src2 \\
 	\hline
-	2Ch & srli Dst, Src1, Const & 1 & B & srli r1, r2, 31 & Dst = Src1$>>$Const \\
+	2Ch & srli Src1, Src2, Const & 1 & B & srli r1, r2, 31 & Src1 = Src2$>>$Const \\
 	\hline
 	2Dh & sll Dst, Src1, Src2 & 1 & A & sll r1, r2, r3 & Dst = Src1$<<$Src2 \\
 	\hline
-	2Eh & slli Dst, Src1, Const & 1 & B & slli r1, r2, 2 & Dst = Src1$<<$Const \\
+	2Eh & slli Src1, Src2, Const & 1 & B & slli r1, r2, 2 & Src1 = Src2$<<$Const \\
 	\hline
-	2Fh & srai Dst, Src1, Const & 1 & B & srai r1, r2, 1 & Dst = Src1$<<<$Const \\
+	2Fh & srai Src1, Src2, Const & 1 & B & srai r1, r2, 1 & Src1 = Src2$<<<$Const \\
 	\hline
 	30h & sra Dst, Src1, Src2 & 1 & A & sra r1, r2, r3 & Dst = Src1$<<<$Src2 \\
 	\hline

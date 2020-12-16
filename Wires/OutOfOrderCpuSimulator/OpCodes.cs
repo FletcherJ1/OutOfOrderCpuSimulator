@@ -71,72 +71,88 @@ namespace OutOfOrderCpuSimulator
             // ... NYI
         }
 
-        private static Dictionary<Op, Tuple<bool, bool>> SrcDependencies = new Dictionary<Op, Tuple<bool, bool>>()
-        {
-            // Op, Src1, Src2
-            { Op.LW, Tuple.Create(false, true) },
-            { Op.LB, Tuple.Create(false, true) },
-            { Op.LBU, Tuple.Create(false, true) },
-            { Op.LH, Tuple.Create(false, true) },
-            { Op.LHU, Tuple.Create(false, true) },
-
-            { Op.SW, Tuple.Create(false, true) },
-            { Op.SB, Tuple.Create(false, true) },
-            { Op.SH, Tuple.Create(false, true) },
-
-            { Op.LDI, Tuple.Create(false, false) },
-            { Op.LDHI, Tuple.Create(false, false) },
-
-            { Op.SLT, Tuple.Create(true, true) },
-            { Op.SLTU, Tuple.Create(true, true) },
-            { Op.SLTI, Tuple.Create(true, true) },
-            { Op.SLTIU, Tuple.Create(false, true) },
-            { Op.BEQ, Tuple.Create(true, true) },
-            { Op.BNE, Tuple.Create(true, true) },
-            { Op.BLT, Tuple.Create(true, true) },
-            { Op.BGE, Tuple.Create(true, true) },
-            { Op.BLTU, Tuple.Create(true, true) },
-            { Op.BGEU, Tuple.Create(true, true) },
-            { Op.JAL, Tuple.Create(false, false) },
-            { Op.JALR, Tuple.Create(false, true) },
-            { Op.J, Tuple.Create(false, false) },
-            { Op.JR, Tuple.Create(false, true) },
-
-            { Op.ADD, Tuple.Create(true, true) },
-            { Op.ADDI, Tuple.Create(true, false) },
-            { Op.SUB, Tuple.Create(true, true) },
-            { Op.SUBI, Tuple.Create(true, false) },
-            { Op.MUL, Tuple.Create(true, true) },
-            { Op.MULH, Tuple.Create(true, true) },
-            { Op.MULHSU, Tuple.Create(true, true) },
-            { Op.MULHU, Tuple.Create(true, true) },
-            { Op.DIV, Tuple.Create(true, true) },
-            { Op.DIVU, Tuple.Create(true, true) },
-            { Op.REM, Tuple.Create(true, true) },
-            { Op.REMU, Tuple.Create(true, true) },
-
-            { Op.AND, Tuple.Create(true, true) },
-            { Op.OR, Tuple.Create(true, true) },
-            { Op.XOR, Tuple.Create(true, true) },
-            { Op.ANDI, Tuple.Create(true, false) },
-            { Op.ORI, Tuple.Create(true, false) },
-            { Op.XORI, Tuple.Create(true, false) },
-            { Op.SRL, Tuple.Create(true, true) },
-            { Op.SRLI, Tuple.Create(true, false) },
-            { Op.SLL, Tuple.Create(true, true) },
-            { Op.SLLI, Tuple.Create(true, false) },
-            { Op.SRAI, Tuple.Create(true, false) },
-            { Op.SRA, Tuple.Create(true, true) },
-        };
-
-        public static bool GetSrc2Dependency(byte op)
-        {
-            return SrcDependencies[(Op)op].Item1;
+        public enum InstrFormat {
+            A = 0,
+            B = 1,
+            C = 2,
         }
 
-        public static bool GetSrc1Dependency(byte op)
+        public enum DstSource {
+            Src1,
+            Src2,
+            Dst,
+        }
+
+        public struct OpInfo
         {
-            return SrcDependencies[(Op)op].Item2;           
+            public InstrFormat Format;
+            public bool Src1Dep;
+            public bool Src2Dep;
+            public bool HasOutput;
+            public DstSource OutputSource;
+        }
+
+        public static Dictionary<Op, OpInfo> OpData = new Dictionary<Op, OpInfo>()
+        {
+            // Op, Src1, Src2
+            { Op.LW, new OpInfo{ Format=InstrFormat.B, HasOutput=true, OutputSource=DstSource.Src1, Src1Dep=false, Src2Dep=true } },
+            { Op.LB, new OpInfo{ Format=InstrFormat.B, HasOutput=true, OutputSource=DstSource.Src1, Src1Dep=false, Src2Dep=true } },
+            { Op.LBU, new OpInfo{ Format=InstrFormat.B, HasOutput=true, OutputSource=DstSource.Src1, Src1Dep=false, Src2Dep=true } },
+            { Op.LH, new OpInfo{ Format=InstrFormat.B, HasOutput=true, OutputSource=DstSource.Src1, Src1Dep=false, Src2Dep=true } },
+            { Op.LHU, new OpInfo{ Format=InstrFormat.B, HasOutput=true, OutputSource=DstSource.Src1, Src1Dep=false, Src2Dep=true } },
+
+            { Op.SW, new OpInfo{ Format=InstrFormat.B, HasOutput=false, Src1Dep=true, Src2Dep=true } },
+            { Op.SB, new OpInfo{ Format=InstrFormat.B, HasOutput=false, Src1Dep=true, Src2Dep=true } },
+            { Op.SH, new OpInfo{ Format=InstrFormat.B, HasOutput=false, Src1Dep=true, Src2Dep=true } },
+
+            { Op.LDI, new OpInfo{ Format=InstrFormat.C, HasOutput=true, OutputSource=DstSource.Src2, Src1Dep=false, Src2Dep=false } },
+            { Op.LDHI, new OpInfo{ Format=InstrFormat.C, HasOutput=true, OutputSource=DstSource.Src2, Src1Dep=false, Src2Dep=false } },
+
+            { Op.SLT, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+            { Op.SLTU, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+            { Op.SLTI, new OpInfo{ Format=InstrFormat.B, HasOutput=true, OutputSource=DstSource.Src1, Src1Dep=false, Src2Dep=true } },
+            { Op.SLTIU, new OpInfo{ Format=InstrFormat.B, HasOutput=true, OutputSource=DstSource.Src1, Src1Dep=false, Src2Dep=true } },
+            { Op.BEQ, new OpInfo{ Format=InstrFormat.B, HasOutput=false, Src1Dep=true, Src2Dep=true }  },
+            { Op.BNE, new OpInfo{ Format=InstrFormat.B, HasOutput=false, Src1Dep=true, Src2Dep=true }  },
+            { Op.BLT, new OpInfo{ Format=InstrFormat.B, HasOutput=false, Src1Dep=true, Src2Dep=true }  },
+            { Op.BGE, new OpInfo{ Format=InstrFormat.B, HasOutput=false, Src1Dep=true, Src2Dep=true }  },
+            { Op.BLTU,new OpInfo{ Format=InstrFormat.B, HasOutput=false, Src1Dep=true, Src2Dep=true }  },
+            { Op.BGEU, new OpInfo{ Format=InstrFormat.B, HasOutput=false, Src1Dep=true, Src2Dep=true }  },
+            { Op.JAL, new OpInfo{ Format=InstrFormat.C, HasOutput=true, OutputSource=DstSource.Src2, Src1Dep=false, Src2Dep=false } },
+            { Op.JALR, new OpInfo{ Format=InstrFormat.B, HasOutput=true, OutputSource=DstSource.Src1, Src1Dep=false, Src2Dep=true } },
+            { Op.J, new OpInfo{ Format=InstrFormat.C, HasOutput=false, Src1Dep=false, Src2Dep=false } },
+            { Op.JR, new OpInfo{ Format=InstrFormat.C, HasOutput=false, Src1Dep=false, Src2Dep=true } },
+
+            { Op.ADD, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+            { Op.ADDI, new OpInfo{ Format=InstrFormat.B, HasOutput=true, OutputSource=DstSource.Src1, Src1Dep=false, Src2Dep=true } },
+            { Op.SUB, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+            { Op.SUBI, new OpInfo{ Format=InstrFormat.B, HasOutput=true, OutputSource=DstSource.Src1, Src1Dep=false, Src2Dep=true } },
+            { Op.MUL, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+            { Op.MULH, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+            { Op.MULHSU, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+            { Op.MULHU, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+            { Op.DIV, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+            { Op.DIVU, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+            { Op.REM, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+            { Op.REMU, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+
+            { Op.AND, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+            { Op.OR, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+            { Op.XOR, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+            { Op.ANDI, new OpInfo{ Format=InstrFormat.B, HasOutput=true, OutputSource=DstSource.Src1, Src1Dep=false, Src2Dep=true } },
+            { Op.ORI, new OpInfo{ Format=InstrFormat.B, HasOutput=true, OutputSource=DstSource.Src1, Src1Dep=false, Src2Dep=true } },
+            { Op.XORI, new OpInfo{ Format=InstrFormat.B, HasOutput=true, OutputSource=DstSource.Src1, Src1Dep=false, Src2Dep=true } },
+            { Op.SRL, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+            { Op.SRLI, new OpInfo{ Format=InstrFormat.B, HasOutput=true, OutputSource=DstSource.Src1, Src1Dep=false, Src2Dep=true } },
+            { Op.SLL, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+            { Op.SLLI, new OpInfo{ Format=InstrFormat.B, HasOutput=true, OutputSource=DstSource.Src1, Src1Dep=false, Src2Dep=true } },
+            { Op.SRAI, new OpInfo{ Format=InstrFormat.B, HasOutput=true, OutputSource=DstSource.Src1, Src1Dep=false, Src2Dep=true } },
+            { Op.SRA, new OpInfo{ Format=InstrFormat.A, HasOutput=true, OutputSource=DstSource.Dst, Src1Dep=true, Src2Dep=true } },
+        };
+
+        public static OpInfo GetInfo(Op op)
+        {
+            return OpData[op];
         }
     }
 }
