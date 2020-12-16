@@ -15,7 +15,7 @@ namespace CPUSimTests
             var values = Enum.GetValues(typeof(OpCodes.Op)).Cast<OpCodes.Op>();
             foreach (OpCodes.Op o in values) 
             {
-                OpCodes.GetSrc1Dependency((byte)o);
+                OpCodes.GetInfo(o);
             }
         }
     }
