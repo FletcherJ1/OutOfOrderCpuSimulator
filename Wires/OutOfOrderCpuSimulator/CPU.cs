@@ -205,8 +205,8 @@ namespace OutOfOrderCpuSimulator
                 // Resulting register of this operation should be declared not ready until it has executed.
                 Console.WriteLine("Rename: rd1={0}, rd2={1}, src1={2}, src2={3}, dst={4}", rd1, rd2, (int)src1, (int)src2, (int)dst);
                 // Add entry to issue queue and re-order buffer
-                this.IQueue.AddToQueue(o.PC, op, src1, src2, dst, rd1, rd2);
-                this.ROB.AddToQueue(o.PC, o.Dst, dst);
+                this.IQueue.AddToQueue(o.PC, op, src1, src2, dst, rd1, rd2, o.Const, o.Meta);
+                this.ROB.AddToQueue(o.PC, o.Dst, dst, o.Meta.HasOutput);
                 maxRename++;
             }
 
@@ -237,7 +237,11 @@ namespace OutOfOrderCpuSimulator
                             this.IQueue.RemoveEntry(i);
                             Console.WriteLine("Issue: PC={0}, Op={1}, l{2}={3}, l{4}={5}, Dst=l{6}", e.PC, (int)e.Op, (int)e.Src1, PhysRegisters.Get(e.Src1), (int)e.Src2, PhysRegisters.Get(e.Src2), (int)e.Dst);
                             // Lookup register values from physical register file and place operation into functional unit.
-                            u.GiveWork(e.PC, e.Op, PhysRegisters.Get(e.Src1), PhysRegisters.Get(e.Src2), e.Dst);
+
+                            int s1 = e.Meta.Src1Dep ? e.Src1 : 0;
+                            int s2 = e.Meta.Src2Dep ? e.Src2 : 0;
+
+                            u.GiveWork(e.PC, e.Op, PhysRegisters.Get(s1), PhysRegisters.Get(s2), e.Dst, e.Const);
                             worked = true;
                             goto more;
                         }
@@ -311,11 +315,15 @@ namespace OutOfOrderCpuSimulator
             while (this.ROB.HasEntries() && this.ROB.HeadCompleted())
             {
                 var head = this.ROB.RemoveHead();
-                // Update architectural register and free the physical register
-                this.ArchRegisters.Set(head.ArchDst, head.Result);
-                this.PhysFreeList.Add(head.PhysDst);
-                // Commit RAT is used for re-winding state when a branch miss occurs.
-                this.CommitRAT.MapArchToPhys(head.ArchDst, head.PhysDst);
+                if (head.DstOutput)
+                {
+                    // Update architectural register and free the physical register
+                    this.ArchRegisters.Set(head.ArchDst, head.Result);
+                    this.PhysFreeList.Add(head.PhysDst);
+                    // Commit RAT is used for re-winding state when a branch miss occurs.
+                    this.CommitRAT.MapArchToPhys(head.ArchDst, head.PhysDst);
+                }
+
                 if (head.Branch)
                 {
                     BranchReplay();
