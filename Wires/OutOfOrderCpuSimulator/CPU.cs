@@ -54,11 +54,12 @@ namespace OutOfOrderCpuSimulator
             this.FUs = new List<FunctionalUnit>();
             this.IQueue = new IssueQueue(ISSUE_QUEUE_SIZE);
             this.ROB = new ReOrderBuffer(REORDER_BUFFER_SIZE);
-            this.FUs.Add(new ArithmeticLogicUnit());
-            this.FUs.Add(new ArithmeticLogicUnit());
-            this.FUs.Add(new ArithmeticLogicUnit());
-            this.FUs.Add(new ArithmeticLogicUnit());
-            this.FUs.Add(new LogicUnit());
+            this.FUs.Add(new ArithmeticLogicUnit(this));
+            this.FUs.Add(new ArithmeticLogicUnit(this));
+            this.FUs.Add(new ArithmeticLogicUnit(this));
+            this.FUs.Add(new ArithmeticLogicUnit(this));
+            this.FUs.Add(new BranchUnit(this));
+            this.FUs.Add(new LoadStoreUnit(this));
         }
 
         public void SetReg(int r, UInt32 v)

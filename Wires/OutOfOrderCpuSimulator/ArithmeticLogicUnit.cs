@@ -40,6 +40,11 @@ namespace OutOfOrderCpuSimulator
             { (byte)0x30, 1 }, // SRA
         };
 
+        public ArithmeticLogicUnit(CPU c) : base(c)
+        {
+
+        }
+
         public override bool AcceptsOp(byte op)
         {
             return OpCycleCost.ContainsKey(op);

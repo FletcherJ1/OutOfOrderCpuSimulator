@@ -4,24 +4,25 @@ using System.Text;
 
 namespace OutOfOrderCpuSimulator
 {
-    class BranchUnit : FunctionalUnit
+    class LoadStoreUnit : FunctionalUnit
     {
         private Dictionary<byte, int> OpCycleCost = new Dictionary<byte, int>()
         {
-            { (byte)0xF, 3 }, // BEQ
-            { (byte)0x10, 3 }, // BNE
-            { (byte)0x11, 3 }, // BLT
-            { (byte)0x12, 3 }, // BGE
-            { (byte)0x13, 3 }, // BLTU
-            { (byte)0x14, 3 }, // BGEU
-            { (byte)0x15, 2 }, // JAL
-            { (byte)0x16, 3 }, // JALR
-            { (byte)0x17, 1 }, // J
-            { (byte)0x18, 2 }, // JR
+            { (byte)0x0, 1 }, // LW
+            { (byte)0x2, 1 }, // LB
+            { (byte)0x3, 1 }, // LBU
+            { (byte)0x4, 1 }, // LH
+            { (byte)0x5, 1 }, // LHU
+            { (byte)0x6, 1 }, // SW
+            { (byte)0x7, 1 }, // SB
+            { (byte)0x8, 1 }, // SH
+            { (byte)0x9, 1 }, // LDI
+            { (byte)0xA, 1 }, // LDHI
         };
 
-        public BranchUnit(CPU c) : base(c)
+        public LoadStoreUnit(CPU c) : base(c)
         {
+
         }
 
         public override bool AcceptsOp(byte op)

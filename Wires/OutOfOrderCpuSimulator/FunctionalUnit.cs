@@ -19,6 +19,13 @@ namespace OutOfOrderCpuSimulator
 
         private UInt32 Result;
 
+        protected CPU Cpu;
+
+        public FunctionalUnit(CPU cpu)
+        {
+            this.Cpu = cpu;
+        }
+
         protected void SetCycles(int cycles)
         {
             this.CycleCount = cycles;
