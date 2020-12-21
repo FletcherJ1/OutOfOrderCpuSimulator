@@ -4,17 +4,20 @@ using System.Text;
 
 namespace OutOfOrderCpuSimulator
 {
-    class IntegerUnit : FunctionalUnit
+    class BranchUnit : FunctionalUnit
     {
         private Dictionary<byte, int> OpCycleCost = new Dictionary<byte, int>()
         {
-            // Technically cycle count is the value in here + 1 due to the result needing
-            // to be captured by the write-back stage in the next cycle. The result could be buffered
-            { (byte)0, 1 }, // ADD
-            { (byte)1, 1 }, // SUB
-            { (byte)2, 6 }, // MUL
-            { (byte)3, 15 }, // DIV
-            { (byte)4, 15 }, // MOD
+            { (byte)0xF, 3 },
+            { (byte)0x10, 3 },
+            { (byte)0x11, 3 },
+            { (byte)0x12, 3 },
+            { (byte)0x13, 3 },
+            { (byte)0x14, 3 },
+            { (byte)0x15, 2 },
+            { (byte)0x16, 3 },
+            { (byte)0x17, 1 },
+            { (byte)0x18, 2 },
         };
 
         public override bool AcceptsOp(byte op)
@@ -26,16 +29,6 @@ namespace OutOfOrderCpuSimulator
         {
             switch (this.Op)
             {
-                case (byte)0:
-                    return Src1 + Src2;
-                case (byte)1:
-                    return Src1 - Src2;
-                case (byte)2:
-                    return Src1 * Src2;
-                case (byte)3:
-                    return Src1 / Src2;
-                case (byte)4:
-                    return Src1 % Src2;
                 default:
                     throw new Exception("Invalid instruction for IntegerUnit op=" + (int)this.Op);
             }
