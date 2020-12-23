@@ -32,8 +32,12 @@ namespace OutOfOrderCpuSimulator
 
         protected override uint GetResult()
         {
-            switch (this.Op)
+            switch ((OpCodes.Op)this.Op)
             {
+                case OpCodes.Op.LDI:
+                    return Const;
+                case OpCodes.Op.LDHI:
+                    return (Const & 0x7ff) << 21;
                 default:
                     throw new Exception("Invalid instruction for IntegerUnit op=" + (int)this.Op);
             }
