@@ -52,8 +52,64 @@ namespace OutOfOrderCpuSimulator
 
         protected override uint GetResult()
         {
-            switch (this.Op)
+            switch ((OpCodes.Op)this.Op)
             {
+                case OpCodes.Op.LDI:
+                    return Const;
+                case OpCodes.Op.LDHI:
+                    return (Const & 0x7ff) << 21;
+                case OpCodes.Op.SLT:
+                    return ((Int32)Src1 < (Int32)Src2) ? 1U : 0U;
+                case OpCodes.Op.SLTU:
+                    return (Src1 < Src2) ? 1U : 0U;
+                case OpCodes.Op.SLTI:
+                    return ((Int32)Src1 < (Int32)(Const >> 4)) ? 1U : 0U;
+                case OpCodes.Op.SLTIU:
+                    return (Src1 < (Const >> 4)) ? 1U : 0U;
+                case OpCodes.Op.ADD:
+                    return Src1 + Src2;
+                case OpCodes.Op.ADDI:
+                    return Src2 + (Const >> 4);
+                case OpCodes.Op.SUB:
+                    return Src1 - Src2;
+                case OpCodes.Op.SUBI:
+                    return Src2 - (Const >> 4);
+                case OpCodes.Op.MUL:
+                    return (uint)((Int32)Src1 * (Int32)Src2);
+                case OpCodes.Op.MULH:
+                    return (uint)(((Int64)Src1 * (Int64)Src2) >> 32);
+                case OpCodes.Op.DIV:
+                    return (uint)((Int32)Src1 / (Int32)Src2);
+                case OpCodes.Op.DIVU:
+                    return Src1 / Src2;
+                case OpCodes.Op.REM:
+                    return (uint)((Int32)Src1 % (Int32)Src2);
+                case OpCodes.Op.REMU:
+                    return Src1 % Src2;
+                case OpCodes.Op.AND:
+                    return Src1 & Src2;
+                case OpCodes.Op.ANDI:
+                    return Src2 & (Const >> 4);
+                case OpCodes.Op.OR:
+                    return Src1 | Src2;
+                case OpCodes.Op.ORI:
+                    return Src2 | (Const >> 4);
+                case OpCodes.Op.XOR:
+                    return Src1 ^ Src2;
+                case OpCodes.Op.XORI:
+                    return Src2 ^ (Const >> 4);
+                case OpCodes.Op.SRL:
+                    return Src1 >> (Int32)Src2;
+                case OpCodes.Op.SRLI:
+                    return Src2 >> (Int32)(Const >> 4);
+                case OpCodes.Op.SLL:
+                    return Src1 << (Int32)Src2;
+                case OpCodes.Op.SLLI:
+                    return Src2 << (Int32)(Const >> 4);
+                case OpCodes.Op.SRA:
+                    return (uint)((Int32)Src1 >> (Int32)Src2);
+                case OpCodes.Op.SRAI:
+                    return (uint)((Int32)Src2 >> (Int32)(Const >> 4));
                 default:
                     throw new Exception("Invalid instruction for IntegerUnit op=" + (int)this.Op);
             }
