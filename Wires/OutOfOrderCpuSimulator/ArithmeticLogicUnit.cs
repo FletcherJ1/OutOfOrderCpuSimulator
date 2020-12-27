@@ -78,6 +78,10 @@ namespace OutOfOrderCpuSimulator
                     return (uint)((Int32)Src1 * (Int32)Src2);
                 case OpCodes.Op.MULH:
                     return (uint)(((Int64)Src1 * (Int64)Src2) >> 32);
+                case OpCodes.Op.MULHU:
+                    return (uint)(((UInt64)Src1 * (UInt64)Src2) >> 32);
+                case OpCodes.Op.MULHSU:
+                    return (uint)(((Int64)Src1 * (Int64)(UInt64)Src2) >> 32);
                 case OpCodes.Op.DIV:
                     return (uint)((Int32)Src1 / (Int32)Src2);
                 case OpCodes.Op.DIVU:
